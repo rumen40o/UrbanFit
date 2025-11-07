@@ -24,7 +24,9 @@
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="c6394658-c819-48ae-92ce-f9b2b3c969ad">
-      <console name="Connection" type="STANDARD" schema="public" session="Main"><![CDATA[select * from users]]></console>
+      <console name="Connection" type="STANDARD" schema="public" session="Main"><![CDATA[select * from users
+select * from categories
+select * from products]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">

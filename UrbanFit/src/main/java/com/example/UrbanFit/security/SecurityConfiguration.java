@@ -2,6 +2,7 @@ package com.example.UrbanFit.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -33,6 +34,8 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 "/auth/**"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/products/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
