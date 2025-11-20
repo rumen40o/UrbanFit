@@ -35,6 +35,8 @@ public class SecurityConfiguration {
                                 "/auth/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
+                        .requestMatchers("/cart/**").authenticated()
+                        .requestMatchers("/orders/**").authenticated()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/products/**").permitAll()
                         .anyRequest().authenticated()
                 )
