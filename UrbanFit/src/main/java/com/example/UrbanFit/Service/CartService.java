@@ -2,10 +2,10 @@ package com.example.UrbanFit.Service;
 
 import com.example.UrbanFit.Service.interfaces.CartServiceInterface;
 import com.example.UrbanFit.models.CartItem;
-import com.example.UrbanFit.models.DTO.AddToCartRequest;
-import com.example.UrbanFit.models.DTO.CartItemDto;
-import com.example.UrbanFit.models.DTO.CartSummaryDto;
-import com.example.UrbanFit.models.DTO.UpdateCartRequest;
+import com.example.UrbanFit.models.DTO.cart.AddToCartRequest;
+import com.example.UrbanFit.models.DTO.cart.CartItemDto;
+import com.example.UrbanFit.models.DTO.cart.CartSummaryDto;
+import com.example.UrbanFit.models.DTO.cart.UpdateCartRequest;
 import com.example.UrbanFit.models.Product;
 import com.example.UrbanFit.models.Users;
 import com.example.UrbanFit.repository.CartItemRepo;

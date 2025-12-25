@@ -2,9 +2,9 @@ package com.example.UrbanFit.Service;
 
 import com.example.UrbanFit.Service.interfaces.ProductServiceInterface;
 import com.example.UrbanFit.models.Category;
-import com.example.UrbanFit.models.DTO.CreateProductRequest;
-import com.example.UrbanFit.models.DTO.ProductDto;
-import com.example.UrbanFit.models.DTO.UpdateProductRequest;
+import com.example.UrbanFit.models.DTO.product.CreateProductRequest;
+import com.example.UrbanFit.models.DTO.product.ProductDto;
+import com.example.UrbanFit.models.DTO.product.UpdateProductRequest;
 import com.example.UrbanFit.models.Product;
 import com.example.UrbanFit.repository.CategoryRepo;
 import com.example.UrbanFit.repository.ProductRepo;

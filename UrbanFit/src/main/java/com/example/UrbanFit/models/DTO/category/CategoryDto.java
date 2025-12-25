@@ -1,4 +1,4 @@
-package com.example.UrbanFit.models.DTO;
+package com.example.UrbanFit.models.DTO.category;
 
 import java.time.Instant;
 

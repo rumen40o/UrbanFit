@@ -1,16 +1,16 @@
-package com.example.UrbanFit.models.DTO;
+package com.example.UrbanFit.models.DTO.category;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public class CreateCategoryRequest {
+public class UpdateCategoryRequest {
     @NotBlank
     @Size(max = 120)
     private String name;
 
-    public CreateCategoryRequest() {}
+    public UpdateCategoryRequest() {}
 
-    public CreateCategoryRequest(String name) {
+    public UpdateCategoryRequest(String name) {
         this.name = name;
     }
 

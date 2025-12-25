@@ -38,6 +38,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/cart/**").authenticated()
                         .requestMatchers("/orders/**").authenticated()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/products/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/reviews/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

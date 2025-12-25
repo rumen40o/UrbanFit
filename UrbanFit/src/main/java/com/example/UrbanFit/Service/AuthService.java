@@ -1,8 +1,8 @@
 package com.example.UrbanFit.Service;
 
 import com.example.UrbanFit.Service.interfaces.AuthServiceInterface;
-import com.example.UrbanFit.models.DTO.AuthRequest;
-import com.example.UrbanFit.models.DTO.RegisterRequest;
+import com.example.UrbanFit.models.DTO.auth.AuthRequest;
+import com.example.UrbanFit.models.DTO.auth.RegisterRequest;
 import com.example.UrbanFit.models.Users;
 import com.example.UrbanFit.models.enums.Roles;
 import com.example.UrbanFit.repository.UserRepo;

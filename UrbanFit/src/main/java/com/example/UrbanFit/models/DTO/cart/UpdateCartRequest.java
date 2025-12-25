@@ -1,4 +1,4 @@
-package com.example.UrbanFit.models.DTO;
+package com.example.UrbanFit.models.DTO.cart;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

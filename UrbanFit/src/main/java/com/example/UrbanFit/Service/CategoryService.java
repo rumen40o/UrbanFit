@@ -3,9 +3,9 @@ package com.example.UrbanFit.Service;
 import com.example.UrbanFit.Service.interfaces.CategoryServiceInterface;
 
 import com.example.UrbanFit.models.Category;
-import com.example.UrbanFit.models.DTO.CategoryDto;
-import com.example.UrbanFit.models.DTO.CreateCategoryRequest;
-import com.example.UrbanFit.models.DTO.UpdateCategoryRequest;
+import com.example.UrbanFit.models.DTO.category.CategoryDto;
+import com.example.UrbanFit.models.DTO.category.CreateCategoryRequest;
+import com.example.UrbanFit.models.DTO.category.UpdateCategoryRequest;
 import com.example.UrbanFit.repository.CategoryRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;

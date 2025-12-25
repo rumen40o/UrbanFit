@@ -1,4 +1,4 @@
-package com.example.UrbanFit.models.DTO;
+package com.example.UrbanFit.models.DTO.order;
 
 import com.example.UrbanFit.models.enums.OrderStatus;
 import com.example.UrbanFit.models.enums.PaymentStatus;

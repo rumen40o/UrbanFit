@@ -1,9 +1,9 @@
 package com.example.UrbanFit.controller;
 
 import com.example.UrbanFit.Service.ProductService;
-import com.example.UrbanFit.models.DTO.CreateProductRequest;
-import com.example.UrbanFit.models.DTO.ProductDto;
-import com.example.UrbanFit.models.DTO.UpdateProductRequest;
+import com.example.UrbanFit.models.DTO.product.CreateProductRequest;
+import com.example.UrbanFit.models.DTO.product.ProductDto;
+import com.example.UrbanFit.models.DTO.product.UpdateProductRequest;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;

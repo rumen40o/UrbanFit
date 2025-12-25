@@ -1,8 +1,8 @@
 package com.example.UrbanFit.Service.interfaces;
 
-import com.example.UrbanFit.models.DTO.CategoryDto;
-import com.example.UrbanFit.models.DTO.CreateCategoryRequest;
-import com.example.UrbanFit.models.DTO.UpdateCategoryRequest;
+import com.example.UrbanFit.models.DTO.category.CategoryDto;
+import com.example.UrbanFit.models.DTO.category.CreateCategoryRequest;
+import com.example.UrbanFit.models.DTO.category.UpdateCategoryRequest;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
 package com.example.UrbanFit.controller;
 
 import com.example.UrbanFit.Service.interfaces.OrderServiceInterface;
-import com.example.UrbanFit.models.DTO.CreateOrderRequest;
-import com.example.UrbanFit.models.DTO.OrderDto;
+import com.example.UrbanFit.models.DTO.order.CreateOrderRequest;
+import com.example.UrbanFit.models.DTO.order.OrderDto;
 import com.example.UrbanFit.models.Users;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,5 @@
 package com.example.UrbanFit.repository;
 
-import com.example.UrbanFit.models.DTO.ProductDto;
 import com.example.UrbanFit.models.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

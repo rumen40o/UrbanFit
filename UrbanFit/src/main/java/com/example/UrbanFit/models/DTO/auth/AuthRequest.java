@@ -1,4 +1,4 @@
-package com.example.UrbanFit.models.DTO;
+package com.example.UrbanFit.models.DTO.auth;
 
 import jakarta.validation.constraints.NotBlank;
 

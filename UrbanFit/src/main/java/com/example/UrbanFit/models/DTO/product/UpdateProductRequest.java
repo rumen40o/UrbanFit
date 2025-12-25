@@ -1,25 +1,22 @@
-package com.example.UrbanFit.models.DTO;
+package com.example.UrbanFit.models.DTO.product;
 
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
-public class CreateProductRequest {
-    @NotBlank
+public class UpdateProductRequest {
     private String name;
     private String description;
-    @NotNull
-    @Min(0) private double price;
+    @Min(0) private Double price;
     private String imageUrl;
-    private Long categoryId;
-    @NotNull @Min(0) private Integer stockQty;
+    private Long categoryId; // може да се смени/нулира
+    @Min(0) private Integer stockQty;
     private Boolean active;
 
+    // getters/setters
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-    public double getPrice() { return price; }
+    public Double getPrice() { return price; }
     public void setPrice(double price) { this.price = price; }
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }

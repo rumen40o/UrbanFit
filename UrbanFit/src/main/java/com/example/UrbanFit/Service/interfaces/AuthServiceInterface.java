@@ -1,7 +1,7 @@
 package com.example.UrbanFit.Service.interfaces;
 
-import com.example.UrbanFit.models.DTO.AuthRequest;
-import com.example.UrbanFit.models.DTO.RegisterRequest;
+import com.example.UrbanFit.models.DTO.auth.AuthRequest;
+import com.example.UrbanFit.models.DTO.auth.RegisterRequest;
 import org.springframework.http.ResponseEntity;
 
 public interface AuthServiceInterface {

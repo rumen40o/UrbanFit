@@ -2,9 +2,9 @@ package com.example.UrbanFit.Service;
 
 import com.example.UrbanFit.Service.interfaces.OrderServiceInterface;
 import com.example.UrbanFit.models.*;
-import com.example.UrbanFit.models.DTO.CreateOrderRequest;
-import com.example.UrbanFit.models.DTO.OrderDto;
-import com.example.UrbanFit.models.DTO.OrderItemDto;
+import com.example.UrbanFit.models.DTO.order.CreateOrderRequest;
+import com.example.UrbanFit.models.DTO.order.OrderDto;
+import com.example.UrbanFit.models.DTO.order.OrderItemDto;
 import com.example.UrbanFit.models.enums.OrderStatus;
 import com.example.UrbanFit.models.enums.PaymentStatus;
 import com.example.UrbanFit.repository.CartItemRepo;

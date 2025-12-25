@@ -5,9 +5,9 @@ package com.example.UrbanFit.controller;
 
 
 import com.example.UrbanFit.Service.interfaces.CategoryServiceInterface;
-import com.example.UrbanFit.models.DTO.CategoryDto;
-import com.example.UrbanFit.models.DTO.CreateCategoryRequest;
-import com.example.UrbanFit.models.DTO.UpdateCategoryRequest;
+import com.example.UrbanFit.models.DTO.category.CategoryDto;
+import com.example.UrbanFit.models.DTO.category.CreateCategoryRequest;
+import com.example.UrbanFit.models.DTO.category.UpdateCategoryRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

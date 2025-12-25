@@ -1,8 +1,8 @@
 package com.example.UrbanFit.Service.interfaces;
 
-import com.example.UrbanFit.models.DTO.CreateProductRequest;
-import com.example.UrbanFit.models.DTO.ProductDto;
-import com.example.UrbanFit.models.DTO.UpdateProductRequest;
+import com.example.UrbanFit.models.DTO.product.CreateProductRequest;
+import com.example.UrbanFit.models.DTO.product.ProductDto;
+import com.example.UrbanFit.models.DTO.product.UpdateProductRequest;
 import org.springframework.data.domain.Page;
 
 public interface ProductServiceInterface {

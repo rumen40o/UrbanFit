@@ -1,9 +1,9 @@
 package com.example.UrbanFit.controller;
 
 import com.example.UrbanFit.Service.interfaces.CartServiceInterface;
-import com.example.UrbanFit.models.DTO.AddToCartRequest;
-import com.example.UrbanFit.models.DTO.CartSummaryDto;
-import com.example.UrbanFit.models.DTO.UpdateCartRequest;
+import com.example.UrbanFit.models.DTO.cart.AddToCartRequest;
+import com.example.UrbanFit.models.DTO.cart.CartSummaryDto;
+import com.example.UrbanFit.models.DTO.cart.UpdateCartRequest;
 import com.example.UrbanFit.models.Users;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

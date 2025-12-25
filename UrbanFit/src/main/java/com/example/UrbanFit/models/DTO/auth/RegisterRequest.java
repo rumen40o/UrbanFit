@@ -1,11 +1,8 @@
-package com.example.UrbanFit.models.DTO;
+package com.example.UrbanFit.models.DTO.auth;
 
 import com.example.UrbanFit.models.enums.Roles;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.*;
 
 
 public class RegisterRequest {

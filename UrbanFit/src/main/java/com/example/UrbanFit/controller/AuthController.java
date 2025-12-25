@@ -1,8 +1,8 @@
 package com.example.UrbanFit.controller;
 
 import com.example.UrbanFit.Service.interfaces.AuthServiceInterface;
-import com.example.UrbanFit.models.DTO.AuthRequest;
-import com.example.UrbanFit.models.DTO.RegisterRequest;
+import com.example.UrbanFit.models.DTO.auth.AuthRequest;
+import com.example.UrbanFit.models.DTO.auth.RegisterRequest;
 import com.example.UrbanFit.models.Users;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
