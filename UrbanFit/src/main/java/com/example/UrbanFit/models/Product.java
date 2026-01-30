@@ -1,5 +1,7 @@
 package com.example.UrbanFit.models;
 
+import com.example.UrbanFit.models.enums.Audience;
+import com.example.UrbanFit.models.enums.ClothingType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
@@ -32,10 +34,13 @@ public class Product {
     @Column(length = 1000)
     private String imageUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id",
-            foreignKey = @ForeignKey(name = "fk_product_category"))
-    private Category category;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private ClothingType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private Audience audience;
 
     @Min(0) @Column(nullable = false)
     private Integer stockQty = 0;
@@ -61,8 +66,18 @@ public class Product {
     public void setPrice(double price) { this.price = price; }
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
-    public Category getCategory() { return category; }
-    public void setCategory(Category category) { this.category = category; }
+    public Audience getAudience() {
+        return audience;
+    }
+    public void setAudience(Audience audience) {
+        this.audience = audience;
+    }
+    public ClothingType getType() {
+        return type;
+    }
+    public void setType(ClothingType type) {
+        this.type = type;
+    }
     public Integer getStockQty() { return stockQty; }
     public void setStockQty(Integer stockQty) { this.stockQty = stockQty; }
     public boolean isActive() { return active; }

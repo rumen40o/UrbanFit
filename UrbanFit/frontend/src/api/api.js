@@ -14,21 +14,15 @@ export const api = {
     me: () => http.get("/auth/logged/user"),
   },
 
-  // ---------- CATEGORIES ----------
-  categories: {
-    list: () => http.get("/categories"),
-    create: (data) => http.post("/categories/add", data), // ADMIN
-    update: (id, data) => http.put(`/categories/${id}`, data), // ADMIN (ако така ти е endpoint-а)
-    remove: (id) => http.delete(`/categories/${id}`), // ADMIN
-  },
-
   // ---------- PRODUCTS ----------
   products: {
-    list: (params) => http.get("/products", { params }),
+    list: (params) => http.get("/products", { params }),       // supports: q, type, audience, sort, page, size
     get: (id) => http.get(`/products/${id}`),
-    create: (data) => http.post("/products/add", data), // ADMIN
-    update: (id, data) => http.put(`/products/${id}`, data), // ADMIN
-    remove: (id) => http.delete(`/products/${id}`), // ADMIN
+
+    // ADMIN
+    create: (data) => http.post("/products/add", data),
+    update: (id, data) => http.put(`/products/${id}`, data),
+    remove: (id) => http.delete(`/products/${id}`),
   },
 
   // ---------- CART ----------

@@ -1,5 +1,7 @@
 package com.example.UrbanFit.models.DTO.product;
 
+import com.example.UrbanFit.models.enums.Audience;
+import com.example.UrbanFit.models.enums.ClothingType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +13,12 @@ public class CreateProductRequest {
     @NotNull
     @Min(0) private double price;
     private String imageUrl;
-    private Long categoryId;
+    @NotNull
+    private ClothingType type;
+
+    @NotNull
+    private Audience audience;
+    ;
     @NotNull @Min(0) private Integer stockQty;
     private Boolean active;
 
@@ -23,8 +30,18 @@ public class CreateProductRequest {
     public void setPrice(double price) { this.price = price; }
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
-    public Long getCategoryId() { return categoryId; }
-    public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }
+    public ClothingType getType() {
+        return type;
+    }
+    public void setType(ClothingType type) {
+        this.type = type;
+    }
+    public Audience getAudience() {
+        return audience;
+    }
+    public void setAudience(Audience audience) {
+        this.audience = audience;
+    }
     public Integer getStockQty() { return stockQty; }
     public void setStockQty(Integer stockQty) { this.stockQty = stockQty; }
     public Boolean getActive() { return active; }

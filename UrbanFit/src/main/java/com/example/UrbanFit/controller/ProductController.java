@@ -4,6 +4,8 @@ import com.example.UrbanFit.Service.ProductService;
 import com.example.UrbanFit.models.DTO.product.CreateProductRequest;
 import com.example.UrbanFit.models.DTO.product.ProductDto;
 import com.example.UrbanFit.models.DTO.product.UpdateProductRequest;
+import com.example.UrbanFit.models.enums.Audience;
+import com.example.UrbanFit.models.enums.ClothingType;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -20,17 +22,20 @@ public class ProductController {
     private final ProductService service;
     public ProductController(ProductService service) { this.service = service; }
 
-    // Публични
+
+
     @GetMapping
     public Page<ProductDto> list(
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size,
-            @RequestParam(required = false) String sort,         // напр. "priceCents,createdAt"
-            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String sort,          // напр. "price,desc"
+            @RequestParam(required = false) ClothingType type,    // напр. TSHIRT
+            @RequestParam(required = false) Audience audience,    // напр. MEN
             @RequestParam(required = false) String q
     ) {
-        return service.findPublic(page, size, sort, categoryId, q);
+        return service.findPublic(page, size, sort, type, audience, q);
     }
+
 
     @GetMapping("/{id}")
     public ProductDto getOne(@PathVariable Long id) {
