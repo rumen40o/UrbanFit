@@ -7,9 +7,10 @@ import com.example.UrbanFit.models.DTO.cart.CartItemDto;
 import com.example.UrbanFit.models.DTO.cart.CartSummaryDto;
 import com.example.UrbanFit.models.DTO.cart.UpdateCartRequest;
 import com.example.UrbanFit.models.Product;
+import com.example.UrbanFit.models.ProductVariant;
 import com.example.UrbanFit.models.Users;
 import com.example.UrbanFit.repository.CartItemRepo;
-import com.example.UrbanFit.repository.ProductRepo;
+import com.example.UrbanFit.repository.ProductVariantRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -20,32 +21,46 @@ import java.util.List;
 public class CartService implements CartServiceInterface {
 
     private final CartItemRepo cartRepo;
-    private final ProductRepo productRepo;
+    private final ProductVariantRepo variantRepo;
 
-    public CartService(CartItemRepo cartRepo, ProductRepo productRepo) {
+    public CartService(CartItemRepo cartRepo, ProductVariantRepo variantRepo) {
         this.cartRepo = cartRepo;
-        this.productRepo = productRepo;
+        this.variantRepo = variantRepo;
     }
 
     @Override
-    @Transactional()
+    @Transactional(Transactional.TxType.SUPPORTS)
     public CartSummaryDto getMyCart(Users user) {
-        var items = cartRepo.findByUser_Id(user.getId());
+        List<CartItem> items = cartRepo.findByUser_Id(user.getId());
         return toSummary(items);
     }
 
     @Override
     public CartSummaryDto add(Users user, AddToCartRequest req) {
-        Product product = productRepo.findById(req.getProductId())
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        Long variantId = req.getVariantId();
+        int addQty = req.getQty();
 
-        CartItem item = cartRepo.findByUserAndProduct(user, product)
-                .orElse(null);
+        ProductVariant variant = variantRepo.findById(variantId)
+                .orElseThrow(() -> new IllegalArgumentException("Variant not found"));
+
+        if (!variant.getProduct().isActive()) {
+            throw new IllegalArgumentException("Product is not available");
+        }
+
+        int stock = variant.getStockQty() == null ? 0 : variant.getStockQty();
+        if (stock <= 0) {
+            throw new IllegalArgumentException("Out of stock");
+        }
+
+        CartItem item = cartRepo.findByUserAndVariant(user, variant).orElse(null);
 
         if (item == null) {
-            item = new CartItem(user, product, req.getQuantity());
+            if (addQty > stock) throw new IllegalArgumentException("Not enough stock");
+            item = new CartItem(user, variant, addQty);
         } else {
-            item.setQuantity(item.getQuantity() + req.getQuantity());
+            int nextQty = item.getQuantity() + addQty;
+            if (nextQty > stock) throw new IllegalArgumentException("Not enough stock");
+            item.setQuantity(nextQty);
         }
 
         cartRepo.save(item);
@@ -53,22 +68,28 @@ public class CartService implements CartServiceInterface {
     }
 
     @Override
-    public CartSummaryDto updateQuantity(Users user, Long productId, UpdateCartRequest req) {
-        Product product = productRepo.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+    public CartSummaryDto updateQty(Users user, Long variantId, UpdateCartRequest req) {
+        int qty = req.getQty();
 
-        CartItem item = cartRepo.findByUserAndProduct(user, product)
+        ProductVariant variant = variantRepo.findById(variantId)
+                .orElseThrow(() -> new IllegalArgumentException("Variant not found"));
+
+        int stock = variant.getStockQty() == null ? 0 : variant.getStockQty();
+        if (qty > stock) throw new IllegalArgumentException("Not enough stock");
+
+        CartItem item = cartRepo.findByUserAndVariant(user, variant)
                 .orElseThrow(() -> new IllegalArgumentException("Item not in cart"));
 
-        item.setQuantity(req.getQuantity());
+        item.setQuantity(qty);
         return getMyCart(user);
     }
 
     @Override
-    public void remove(Users user, Long productId) {
-        Product product = productRepo.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-        cartRepo.findByUserAndProduct(user, product)
+    public void remove(Users user, Long variantId) {
+        ProductVariant variant = variantRepo.findById(variantId)
+                .orElseThrow(() -> new IllegalArgumentException("Variant not found"));
+
+        cartRepo.findByUserAndVariant(user, variant)
                 .ifPresent(cartRepo::delete);
     }
 
@@ -77,17 +98,31 @@ public class CartService implements CartServiceInterface {
         cartRepo.deleteByUser_Id(user.getId());
     }
 
-    // helpers
+    // ---------- helpers ----------
+
     private CartSummaryDto toSummary(List<CartItem> items) {
         List<CartItemDto> dtos = items.stream()
-                .map(ci -> new CartItemDto(
-                        ci.getProduct().getId(),
-                        ci.getProduct().getName(),
-                        ci.getQuantity(),
-                        ci.getProduct().getPrice()
-                )).toList();
+                .map(ci -> {
+                    ProductVariant v = ci.getVariant();
+                    Product p = v.getProduct();
 
-        double total = dtos.stream().mapToDouble(CartItemDto::getLineTotal).sum();
+                    return new CartItemDto(
+                            v.getId(),                 // variantId
+                            p.getId(),                 // productId
+                            p.getName(),
+                            p.getImageUrl(),
+                            p.getType().name(),
+                            p.getAudience().name(),
+                            v.getSize(),
+                            ci.getQuantity(),          // qty
+                            v.getStockQty(),           // maxQty
+                            p.getPrice()               // unitPrice
+                    );
+                })
+                .toList();
+
+        // ако си оставил CartSummaryDto да си смята total сам — може просто new CartSummaryDto(dtos)
+        double total = dtos.stream().mapToDouble(d -> d.getLineTotal() != null ? d.getLineTotal() : 0.0).sum();
         return new CartSummaryDto(dtos, total);
     }
 }

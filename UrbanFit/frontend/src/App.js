@@ -5,7 +5,9 @@ import Register from './pages/Register';
 import Product from './pages/Product';
 import { Route, Routes } from "react-router-dom";
 import api from './api/api';
+import Cart from './pages/Cart';
 import React, { useEffect, useState } from "react";
+import ProductDetails from './pages/ProductDetails';
 import './App.css';
 
 function App() {
@@ -32,6 +34,8 @@ function App() {
             <Route path="/login" element={<Login setUser={setUser} />} />
             <Route path="/register" element={<Register />} />
             <Route path="/products" element={<Product user={user} />} />
+            <Route path="/products/:id" element={<ProductDetails user={user} />} />
+            <Route path="/cart" element={<Cart />} />
         </Routes>
     </div>
   );

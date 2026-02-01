@@ -1,12 +1,22 @@
 package com.example.UrbanFit.models.DTO.cart;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 public class AddToCartRequest {
-    @NotNull private Long productId;
-    @NotNull @Min(1) private Integer quantity;
 
-    public Long getProductId() { return productId; } public void setProductId(Long productId) { this.productId = productId; }
-    public Integer getQuantity() { return quantity; } public void setQuantity(Integer quantity) { this.quantity = quantity; }
+    @NotNull
+    private Long variantId;
+
+    @NotNull
+    @Min(1)
+    @JsonAlias({"quantity"}) // ще приема и "quantity" ако някъде още го пращаш
+    private Integer qty;
+
+    public Long getVariantId() { return variantId; }
+    public void setVariantId(Long variantId) { this.variantId = variantId; }
+
+    public Integer getQty() { return qty; }
+    public void setQty(Integer qty) { this.qty = qty; }
 }

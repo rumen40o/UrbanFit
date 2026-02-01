@@ -46,18 +46,25 @@ public class AdminOrderService implements AdminOrderServiceInterface {
     public OrderDto updateStatus(Long id, AdminUpdateOrderStatusRequest req) {
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
         order.setStatus(req.getStatus());
+        // save не е нужен, защото сме в транзакция и entity е managed
         return toDto(order);
     }
 
     private OrderDto toDto(Order order) {
         List<OrderItemDto> items = order.getItems().stream()
                 .map(oi -> new OrderItemDto(
-                        oi.getProduct().getId(),
-                        oi.getProduct().getName(),
+                        oi.getProductId(),
+                        oi.getProductName(),
+                        oi.getVariantId(),
+                        oi.getSize(),
+                        oi.getType(),
+                        oi.getAudience(),
                         oi.getQuantity(),
                         oi.getUnitPrice()
-                )).toList();
+                ))
+                .toList();
 
         return new OrderDto(
                 order.getId(),

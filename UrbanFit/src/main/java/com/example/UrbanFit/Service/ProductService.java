@@ -2,15 +2,21 @@ package com.example.UrbanFit.Service;
 
 import com.example.UrbanFit.Service.interfaces.ProductServiceInterface;
 import com.example.UrbanFit.models.DTO.product.CreateProductRequest;
+import com.example.UrbanFit.models.DTO.product.CreateVariantRequest;
+import com.example.UrbanFit.models.DTO.product.ProductDetailsDto;
 import com.example.UrbanFit.models.DTO.product.ProductDto;
 import com.example.UrbanFit.models.DTO.product.UpdateProductRequest;
+import com.example.UrbanFit.models.DTO.product.VariantDto;
 import com.example.UrbanFit.models.Product;
+import com.example.UrbanFit.models.ProductVariant;
 import com.example.UrbanFit.models.enums.Audience;
 import com.example.UrbanFit.models.enums.ClothingType;
 import com.example.UrbanFit.repository.ProductRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -43,7 +49,6 @@ public class ProductService implements ProductServiceInterface {
 
         Page<Product> result;
 
-        // 8 комбинации: type? audience? q?
         if (type != null && audience != null && hasQ) {
             result = repo.findByActiveTrueAndTypeAndAudienceAndNameContainingIgnoreCase(type, audience, query, pageable);
         } else if (type != null && audience != null) {
@@ -62,15 +67,29 @@ public class ProductService implements ProductServiceInterface {
             result = repo.findByActiveTrue(pageable);
         }
 
-        return result.map(this::toDto);
+        return result.map(this::toListDto);
     }
 
     @Override
     @Transactional(Transactional.TxType.SUPPORTS)
-    public ProductDto findById(Long id) {
-        Product p = repo.findById(id)
+    public ProductDetailsDto findDetails(Long id) {
+        Product p = repo.findWithVariantsById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-        return toDto(p);
+
+        return new ProductDetailsDto(
+                p.getId(),
+                p.getName(),
+                p.getDescription(),
+                p.getPrice(),
+                p.getImageUrl(),
+                p.getType(),
+                p.getAudience(),
+                p.isActive(),
+                p.getCreatedAt(),
+                p.getVariants().stream()
+                        .map(v -> new VariantDto(v.getId(), v.getSize(), v.getStockQty()))
+                        .collect(Collectors.toList())
+        );
     }
 
     @Override
@@ -80,15 +99,34 @@ public class ProductService implements ProductServiceInterface {
         p.setDescription(req.getDescription());
         p.setPrice(req.getPrice());
         p.setImageUrl(req.getImageUrl());
-        p.setStockQty(req.getStockQty());
         p.setActive(req.getActive() == null || req.getActive());
+        p.setType(req.getType());
+        p.setAudience(req.getAudience());
 
-        // NEW
-        p.setType(req.getType());           // NOT NULL
-        p.setAudience(req.getAudience());   // NOT NULL
+        if (req.getVariants() == null || req.getVariants().isEmpty()) {
+            throw new IllegalArgumentException("At least one size variant is required");
+        }
+
+        for (CreateVariantRequest vr : req.getVariants()) {
+            if (vr.getSize() == null || vr.getSize().isBlank()) {
+                throw new IllegalArgumentException("Variant size is required");
+            }
+            if (vr.getStockQty() == null || vr.getStockQty() < 0) {
+                throw new IllegalArgumentException("Variant stockQty must be >= 0");
+            }
+
+            ProductVariant v = new ProductVariant();
+            v.setSize(vr.getSize().trim());
+            v.setStockQty(vr.getStockQty());
+
+            v.setProduct(p);
+            p.getVariants().add(v);
+        }
 
         p = repo.save(p);
-        return toDto(p);
+
+        // интерфейсът ти иска ProductDto, затова връщаме list dto (без variants)
+        return toListDto(p);
     }
 
     @Override
@@ -100,14 +138,12 @@ public class ProductService implements ProductServiceInterface {
         if (req.getDescription() != null) p.setDescription(req.getDescription());
         if (req.getPrice() != null) p.setPrice(req.getPrice());
         if (req.getImageUrl() != null) p.setImageUrl(req.getImageUrl());
-        if (req.getStockQty() != null) p.setStockQty(req.getStockQty());
         if (req.getActive() != null) p.setActive(req.getActive());
 
-        // NEW
         if (req.getType() != null) p.setType(req.getType());
         if (req.getAudience() != null) p.setAudience(req.getAudience());
 
-        return toDto(p);
+        return toListDto(p);
     }
 
     @Override
@@ -122,16 +158,15 @@ public class ProductService implements ProductServiceInterface {
         if (sortParam == null || sortParam.isBlank()) {
             return Sort.by(Sort.Order.desc("createdAt"));
         }
+
         String[] parts = sortParam.split(",");
         String field = parts[0].trim();
         String dir = (parts.length > 1) ? parts[1].trim().toLowerCase() : "asc";
 
-        // whitelist
         switch (field) {
             case "name":
             case "price":
             case "createdAt":
-            case "stockQty":
                 break;
             default:
                 field = "createdAt";
@@ -142,18 +177,18 @@ public class ProductService implements ProductServiceInterface {
                 : Sort.by(Sort.Order.asc(field));
     }
 
-    private ProductDto toDto(Product p) {
+    private ProductDto toListDto(Product p) {
         return new ProductDto(
                 p.getId(),
                 p.getName(),
                 p.getDescription(),
                 p.getPrice(),
                 p.getImageUrl(),
-                p.getType(),       // NEW
-                p.getAudience(),   // NEW
-                p.getStockQty(),
+                p.getType(),
+                p.getAudience(),
                 p.isActive(),
-                p.getCreatedAt()
+                p.getCreatedAt(),
+                null
         );
     }
 }

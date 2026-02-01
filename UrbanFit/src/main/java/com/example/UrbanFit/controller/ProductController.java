@@ -2,6 +2,7 @@ package com.example.UrbanFit.controller;
 
 import com.example.UrbanFit.Service.ProductService;
 import com.example.UrbanFit.models.DTO.product.CreateProductRequest;
+import com.example.UrbanFit.models.DTO.product.ProductDetailsDto;
 import com.example.UrbanFit.models.DTO.product.ProductDto;
 import com.example.UrbanFit.models.DTO.product.UpdateProductRequest;
 import com.example.UrbanFit.models.enums.Audience;
@@ -20,10 +21,12 @@ import java.net.URI;
 public class ProductController {
 
     private final ProductService service;
-    public ProductController(ProductService service) { this.service = service; }
 
+    public ProductController(ProductService service) {
+        this.service = service;
+    }
 
-
+    // ---------- PUBLIC LIST ----------
     @GetMapping
     public Page<ProductDto> list(
             @RequestParam(required = false) Integer page,
@@ -36,13 +39,13 @@ public class ProductController {
         return service.findPublic(page, size, sort, type, audience, q);
     }
 
-
+    // ---------- PUBLIC DETAILS (WITH VARIANTS) ----------
     @GetMapping("/{id}")
-    public ProductDto getOne(@PathVariable Long id) {
-        return service.findById(id);
+    public ProductDetailsDto getOne(@PathVariable Long id) {
+        return service.findDetails(id);
     }
 
-    // Админ
+    // ---------- ADMIN ----------
     @PostMapping("/add")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductDto> create(@Valid @RequestBody CreateProductRequest req) {

@@ -27,12 +27,12 @@ export const api = {
 
   // ---------- CART ----------
   cart: {
-    get: () => http.get("/cart"),
-    add: (data) => http.post("/cart/add", data),
-    updateQty: (productId, data) => http.patch(`/cart/item/${productId}`, data),
-    remove: (productId) => http.delete(`/cart/item/${productId}`),
-    clear: () => http.delete("/cart/clear"),
-  },
+  get: () => http.get("/cart"),
+  add: (data) => http.post("/cart/add", data),
+  updateQty: (variantId, data) => http.patch(`/cart/item/${variantId}`, data),
+  remove: (variantId) => http.delete(`/cart/item/${variantId}`),
+  clear: () => http.delete("/cart/clear"),
+},
 
   // ---------- ORDERS ----------
   orders: {

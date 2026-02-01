@@ -8,12 +8,14 @@ export default function AddProductModal({ open, onClose, onCreated }) {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [stockQty, setStockQty] = useState(0);
   const [active, setActive] = useState(true);
 
-  // NEW
+  // enums
   const [type, setType] = useState("");
   const [audience, setAudience] = useState("");
+
+  // variants (sizes)
+  const [variants, setVariants] = useState([{ size: "", stockQty: 0 }]);
 
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
@@ -25,16 +27,30 @@ export default function AddProductModal({ open, onClose, onCreated }) {
     setDescription("");
     setPrice("");
     setImageUrl("");
-    setStockQty(0);
     setActive(true);
 
-    // NEW resets
     setType("");
     setAudience("");
+
+    setVariants([{ size: "", stockQty: 0 }]);
 
     setErr("");
     setLoading(false);
   }, [open]);
+
+  const updateVariant = (idx, patch) => {
+    setVariants((prev) =>
+      prev.map((v, i) => (i === idx ? { ...v, ...patch } : v))
+    );
+  };
+
+  const addVariantRow = () => {
+    setVariants((prev) => [...prev, { size: "", stockQty: 0 }]);
+  };
+
+  const removeVariantRow = (idx) => {
+    setVariants((prev) => prev.filter((_, i) => i !== idx));
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -43,12 +59,34 @@ export default function AddProductModal({ open, onClose, onCreated }) {
     const parsedPrice = Number(price);
 
     if (!name.trim()) return setErr("Name is required");
-    if (Number.isNaN(parsedPrice) || parsedPrice < 0) return setErr("Price must be a valid number >= 0");
-    if (Number(stockQty) < 0) return setErr("Stock must be >= 0");
+    if (Number.isNaN(parsedPrice) || parsedPrice < 0)
+      return setErr("Price must be a valid number >= 0");
 
-    // NEW required
     if (!type) return setErr("Type is required");
     if (!audience) return setErr("Audience is required");
+
+    // validate variants
+    const cleaned = variants
+      .map((v) => ({
+        size: (v.size || "").trim(),
+        stockQty: Number(v.stockQty),
+      }))
+      .filter((v) => v.size.length > 0); // махаме празните редове
+
+    if (cleaned.length === 0) return setErr("Add at least 1 size variant");
+
+    for (const v of cleaned) {
+      if (!Number.isInteger(v.stockQty) || v.stockQty < 0) {
+        return setErr("Each variant stock must be an integer >= 0");
+      }
+    }
+
+    // no duplicate sizes
+    const sizes = cleaned.map((v) => v.size.toUpperCase());
+    const unique = new Set(sizes);
+    if (unique.size !== sizes.length) {
+      return setErr("Duplicate sizes are not allowed");
+    }
 
     setLoading(true);
     try {
@@ -57,10 +95,10 @@ export default function AddProductModal({ open, onClose, onCreated }) {
         description: description || null,
         price: parsedPrice,
         imageUrl: imageUrl || null,
-        stockQty: Number(stockQty) || 0,
         active,
-        type,       // enum string e.g. "TSHIRT"
-        audience,   // enum string e.g. "MEN"
+        type,
+        audience,
+        variants: cleaned, // ✅ това е важното
       });
 
       onCreated?.();
@@ -80,7 +118,9 @@ export default function AddProductModal({ open, onClose, onCreated }) {
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal__header">
           <h3>Add Product</h3>
-          <button className="modal__close" onClick={onClose}>✕</button>
+          <button className="modal__close" onClick={onClose} type="button">
+            ✕
+          </button>
         </div>
 
         <form className="modal__form" onSubmit={submit}>
@@ -105,7 +145,7 @@ export default function AddProductModal({ open, onClose, onCreated }) {
 
           <div className="modal__row">
             <label className="modal__label">
-              Price (лв.) *
+              Price (€) *
               <input
                 className="modal__input"
                 type="number"
@@ -115,20 +155,9 @@ export default function AddProductModal({ open, onClose, onCreated }) {
                 onChange={(e) => setPrice(e.target.value)}
               />
             </label>
-
-            <label className="modal__label">
-              Stock
-              <input
-                className="modal__input"
-                type="number"
-                min="0"
-                value={stockQty}
-                onChange={(e) => setStockQty(e.target.value)}
-              />
-            </label>
           </div>
 
-          {/* NEW: Type + Audience */}
+          {/* Type + Audience */}
           <div className="modal__row">
             <label className="modal__label">
               Type *
@@ -139,7 +168,9 @@ export default function AddProductModal({ open, onClose, onCreated }) {
               >
                 <option value="">Select type</option>
                 {CLOTHING_TYPES.map((t) => (
-                  <option key={t} value={t}>{t}</option>
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
                 ))}
               </select>
             </label>
@@ -153,7 +184,9 @@ export default function AddProductModal({ open, onClose, onCreated }) {
               >
                 <option value="">Select audience</option>
                 {AUDIENCES.map((a) => (
-                  <option key={a} value={a}>{a}</option>
+                  <option key={a} value={a}>
+                    {a}
+                  </option>
                 ))}
               </select>
             </label>
@@ -167,6 +200,49 @@ export default function AddProductModal({ open, onClose, onCreated }) {
               onChange={(e) => setImageUrl(e.target.value)}
             />
           </label>
+
+          {/* Variants */}
+          <div className="modal__variants">
+            <div className="modal__variantsTop">
+              <div className="modal__label" style={{ fontWeight: 700 }}>
+                Sizes *
+              </div>
+              <button type="button" className="btn" onClick={addVariantRow}>
+                + Add size
+              </button>
+            </div>
+
+            {variants.map((v, idx) => (
+              <div className="modal__variantRow" key={idx}>
+                <input
+                  className="modal__input"
+                  placeholder="Size (e.g. S, M, 42)"
+                  value={v.size}
+                  onChange={(e) => updateVariant(idx, { size: e.target.value })}
+                />
+
+                <input
+                  className="modal__input"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={v.stockQty}
+                  onChange={(e) =>
+                    updateVariant(idx, { stockQty: e.target.value })
+                  }
+                />
+
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => removeVariantRow(idx)}
+                  disabled={variants.length === 1}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
 
           <label className="modal__checkbox">
             <input

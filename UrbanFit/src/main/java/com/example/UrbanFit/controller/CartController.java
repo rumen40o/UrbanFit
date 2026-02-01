@@ -40,7 +40,7 @@ public class CartController {
     public CartSummaryDto updateQuantity(@AuthenticationPrincipal Users user,
                                          @PathVariable Long productId,
                                          @Valid @RequestBody UpdateCartRequest req) {
-        return service.updateQuantity(user, productId, req);
+        return service.updateQty(user, productId, req);
     }
 
     @DeleteMapping("/item/{productId}")

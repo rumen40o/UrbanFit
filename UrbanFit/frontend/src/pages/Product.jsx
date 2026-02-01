@@ -196,18 +196,13 @@ export default function Products({ user }) {
                   <div className="productCard__title">{p.name}</div>
 
                   <div className="productCard__price">
-                    {Number(p.price).toFixed(2)} лв.
+                    {Number(p.price).toFixed(2)} €
                   </div>
 
                   <div className="productCard__meta">
                     <span className="badge badge--neutral">{p.type}</span>
                     <span className="badge badge--neutral">{p.audience}</span>
-
-                    {p.stockQty > 0 ? (
-                      <span className="badge badge--ok">In stock</span>
-                    ) : (
-                      <span className="badge badge--bad">Out of stock</span>
-                    )}
+                    <span className="badge badge--neutral">View details</span>
                   </div>
                 </div>
               </Link>

@@ -1,6 +1,7 @@
 package com.example.UrbanFit.Service.interfaces;
 
 import com.example.UrbanFit.models.DTO.product.CreateProductRequest;
+import com.example.UrbanFit.models.DTO.product.ProductDetailsDto;
 import com.example.UrbanFit.models.DTO.product.ProductDto;
 import com.example.UrbanFit.models.DTO.product.UpdateProductRequest;
 import com.example.UrbanFit.models.enums.Audience;
@@ -18,7 +19,8 @@ public interface ProductServiceInterface {
             String q
     );
 
-    ProductDto findById(Long id);
+    // NEW: details with variants
+    ProductDetailsDto findDetails(Long id);
 
     ProductDto create(CreateProductRequest req);
 
@@ -26,4 +28,5 @@ public interface ProductServiceInterface {
 
     void delete(Long id);
 }
+
 

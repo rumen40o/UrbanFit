@@ -127,3 +127,63 @@
 .danger {
   color: #dc2626;
 }
+
+.nav { border-bottom: 1px solid #e7e7e7; background: #fff; position: sticky; top: 0; z-index: 50; }
+.nav__inner { max-width: 1100px; margin: 0 auto; padding: 10px 16px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.nav__brand { font-weight: 800; text-decoration:none; color:#111; }
+.nav__links { display:flex; gap:14px; align-items:center; }
+.nav__link { text-decoration:none; color:#222; opacity:.9; }
+.nav__right { display:flex; align-items:center; gap:12px; }
+
+.navCart { position: relative; }
+.navCart__btn { position: relative; border: 1px solid #ddd; background:#fff; border-radius: 10px; padding: 8px 10px; cursor:pointer; }
+.navCart__badge {
+  position:absolute; top:-6px; right:-6px;
+  background:#111; color:#fff; border-radius: 999px;
+  font-size: 12px; padding: 2px 6px;
+}
+
+.navCart__dropdown {
+  position:absolute;
+  right:0;
+  top: 44px;
+  width: 380px;
+  background:#fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.10);
+  overflow:hidden;
+}
+
+.navCart__head { padding: 12px; display:flex; align-items:center; justify-content:space-between; border-bottom: 1px solid #eee; }
+.navCart__title { font-weight: 800; }
+.navCart__muted { opacity: .7; font-size: 12px; }
+
+.navCart__empty { padding: 14px; opacity:.8; }
+
+.navCart__list { max-height: 320px; overflow:auto; padding: 10px; display:flex; flex-direction:column; gap:10px; }
+
+.navCartItem {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 10px;
+  display:grid;
+  grid-template-columns: 1fr auto;
+  gap:10px;
+}
+
+.navCartItem__name { font-weight: 700; }
+.navCartItem__size { font-weight: 500; opacity:.7; margin-left: 6px; }
+.navCartItem__price { opacity:.8; font-size: 13px; margin-top: 4px; }
+.navCartItem__total { font-weight: 800; text-align:right; margin-top: 6px; }
+
+.navCartItem__qty { display:flex; align-items:center; gap:8px; justify-content:flex-end; }
+.navCartItem__qty button { width: 30px; height: 30px; border-radius: 8px; border: 1px solid #ddd; background:#fff; cursor:pointer; }
+.navCartItem__qty span { min-width: 24px; text-align:center; }
+
+.navCartItem__remove { border:none; background:transparent; cursor:pointer; opacity:.6; justify-self:end; }
+
+.navCart__footer { border-top: 1px solid #eee; padding: 12px; display:flex; flex-direction:column; gap:10px; }
+.navCart__sum { display:flex; justify-content:space-between; align-items:center; }
+.navCart__actions { display:flex; gap:10px; justify-content:flex-end; }
+

@@ -1,79 +1,207 @@
-import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import api from "../../api/api.js";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../../api/api";
 import "./css/Navbar.css";
 
-export default function Navbar({ user, setUser }) {
-  const nav = useNavigate();
-  const location = useLocation();
+export default function Navbar({ user, onLogout }) {
+  const navigate = useNavigate();
 
-  const [q, setQ] = useState("");
-  const [menuOpen, setMenuOpen] = useState(false);
+  // cart dropdown state
+  const [openCart, setOpenCart] = useState(false);
+  const [cart, setCart] = useState(null);
+  const [loadingCart, setLoadingCart] = useState(false);
+  const [busyId, setBusyId] = useState(null); // variantId
+  const cartRef = useRef(null);
 
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    setQ(params.get("q") || "");
-  }, [location.search]);
+  const items = cart?.items || [];
+  const total = Number(cart?.total || 0);
 
-  const onSearchSubmit = (e) => {
-    e.preventDefault();
-    const query = q.trim();
-    nav(query ? `/products?q=${encodeURIComponent(query)}` : "/products");
+  const loadCart = async () => {
+    if (!user) return; // cart е само за логнати (твоят backend е isAuthenticated)
+    setLoadingCart(true);
+    try {
+      const res = await api.cart.get();
+      setCart(res.data);
+    } catch (e) {
+      setCart({ items: [], total: 0 });
+    } finally {
+      setLoadingCart(false);
+    }
   };
 
-  const logout = async () => {
-    await api.auth.logout().catch(() => {});
-    setUser(null);
-    setMenuOpen(false);
-    nav("/");
+  // close on outside click
+  useEffect(() => {
+    const onDown = (e) => {
+      if (!cartRef.current) return;
+      if (!cartRef.current.contains(e.target)) setOpenCart(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, []);
+
+  // when open -> load cart
+  useEffect(() => {
+    if (openCart) loadCart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openCart]);
+
+  const inc = async (variantId, currentQty) => {
+  setBusyId(variantId);
+  try {
+    await api.cart.updateQty(variantId, { quantity: currentQty + 1 });
+    await loadCart();
+  } catch (e) {
+    alert(e?.response?.data || "Failed");
+  } finally {
+    setBusyId(null);
+  }
+};
+
+const dec = async (variantId, currentQty) => {
+  if (currentQty <= 1) return;
+  setBusyId(variantId);
+  try {
+    await api.cart.updateQty(variantId, { quantity: currentQty - 1 });
+    await loadCart();
+  } catch (e) {
+    alert(e?.response?.data || "Failed");
+  } finally {
+    setBusyId(null);
+  }
+};
+
+  const remove = async (variantId) => {
+    setBusyId(variantId);
+    try {
+      await api.cart.remove(variantId);
+      await loadCart();
+    } catch (e) {
+      alert(e?.response?.data || "Failed");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const goCart = () => {
+    setOpenCart(false);
+    navigate("/cart");
+  };
+
+  const goCheckout = () => {
+    setOpenCart(false);
+    navigate("/checkout");
   };
 
   return (
-    <header className="navbar">
-      <Link to="/" className="navbar__logo">UrbanFit</Link>
+    <div className="nav">
+      <div className="nav__inner">
+        <Link to="/" className="nav__brand">UrbanFit</Link>
 
-      <form className="navbar__search" onSubmit={onSearchSubmit}>
-        <input
-          className="navbar__search-input"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Search products..."
-        />
-        <button className="navbar__search-btn">Search</button>
-      </form>
-
-      {!user ? (
-        <div className="navbar__auth">
-          <Link to="/login"><button className="btn">Login</button></Link>
-          <Link to="/register"><button className="btn btn--primary">Register</button></Link>
+        <div className="nav__links">
+          <Link to="/products" className="nav__link">Products</Link>
         </div>
-      ) : (
-        <div className="navbar__user">
-          <button
-            className="navbar__user-btn"
-            onClick={() => setMenuOpen(v => !v)}
-          >
-            👤
-          </button>
 
-          {menuOpen && (
-            <div className="navbar__dropdown">
-              <div className="navbar__dropdown-user">
-                <strong>{user.username}</strong>
-                <span>{user.role}</span>
+        <div className="nav__right">
+          {/* CART ICON */}
+          <div className="navCart" ref={cartRef}>
+            <button
+              className="navCart__btn"
+              onClick={() => {
+                if (!user) return navigate("/login");
+                setOpenCart((v) => !v);
+              }}
+              title="Cart"
+            >
+              🛒
+              {user && items.length > 0 && <span className="navCart__badge">{items.length}</span>}
+            </button>
+
+            {openCart && (
+              <div className="navCart__dropdown">
+                <div className="navCart__head">
+                  <div className="navCart__title">Cart</div>
+                  {loadingCart && <div className="navCart__muted">Loading...</div>}
+                </div>
+
+                {!loadingCart && items.length === 0 && (
+                  <div className="navCart__empty">Cart is empty.</div>
+                )}
+
+                {!loadingCart && items.length > 0 && (
+                  <>
+                    <div className="navCart__list">
+                      {items.map((it) => (
+                        <div key={it.variantId} className="navCartItem">
+                          <div className="navCartItem__main">
+                            <div className="navCartItem__name">
+                              {it.productName} <span className="navCartItem__size">({it.size})</span>
+                            </div>
+                            <div className="navCartItem__price">
+                              {Number(it.price).toFixed(2)} € / pcs
+                            </div>
+                          </div>
+
+                          <div className="navCartItem__qty">
+                            <button
+                              onClick={() => dec(it.variantId, it.quantity)}
+                              disabled={busyId === it.variantId || it.quantity <= 1}
+                            >
+                              -
+                            </button>
+                            <span>{it.quantity}</span>
+                            <button
+                              onClick={() => inc(it.variantId, it.quantity)}
+                              disabled={busyId === it.variantId}
+                            >
+                              +
+                            </button>
+                          </div>
+
+                          <div className="navCartItem__total">
+                            {Number(it.lineTotal).toFixed(2)} €
+                          </div>
+
+                          <button
+                            className="navCartItem__remove"
+                            onClick={() => remove(it.variantId)}
+                            disabled={busyId === it.variantId}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="navCart__footer">
+                      <div className="navCart__sum">
+                        <span>Total</span>
+                        <b>{total.toFixed(2)} €</b>
+                      </div>
+
+                      <div className="navCart__actions">
+                        <button className="btn" onClick={goCart}>View cart</button>
+                        <button className="btn btn--primary" onClick={goCheckout}>Checkout</button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
+            )}
+          </div>
 
-              <button onClick={() => nav("/products")}>Products</button>
-
-              {user.role === "ADMIN" && (
-                <button onClick={() => nav("/admin/orders")}>Admin Orders</button>
-              )}
-
-              <button className="danger" onClick={logout}>Logout</button>
+          {/* USER AREA */}
+          {user ? (
+            <div className="nav__user">
+              <button className="btn" onClick={onLogout}>Logout</button>
+            </div>
+          ) : (
+            <div className="nav__auth">
+              <Link className="btn" to="/login">Login</Link>
+              <Link className="btn btn--primary" to="/register">Register</Link>
             </div>
           )}
         </div>
-      )}
-    </header>
+      </div>
+    </div>
   );
 }

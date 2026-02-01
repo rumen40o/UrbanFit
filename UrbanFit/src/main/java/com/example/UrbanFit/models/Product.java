@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "products", indexes = {
@@ -42,14 +44,15 @@ public class Product {
     @Column(nullable = false, length = 10)
     private Audience audience;
 
-    @Min(0) @Column(nullable = false)
-    private Integer stockQty = 0;
-
     @Column(nullable = false)
     private boolean active = true;
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("size ASC")
+    private List<ProductVariant> variants = new ArrayList<>();
 
     public Product() {}
 
@@ -78,8 +81,12 @@ public class Product {
     public void setType(ClothingType type) {
         this.type = type;
     }
-    public Integer getStockQty() { return stockQty; }
-    public void setStockQty(Integer stockQty) { this.stockQty = stockQty; }
+    public List<ProductVariant> getVariants() {
+        return variants;
+    }
+    public void setVariants(List<ProductVariant> variants) {
+        this.variants = variants;
+    }
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
     public Instant getCreatedAt() { return createdAt; }
