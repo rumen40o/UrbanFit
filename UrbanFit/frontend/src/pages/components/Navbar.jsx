@@ -5,6 +5,7 @@ import "./css/Navbar.css";
 
 export default function Navbar({ user, onLogout }) {
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
 
   // cart dropdown state
   const [openCart, setOpenCart] = useState(false);
@@ -12,6 +13,16 @@ export default function Navbar({ user, onLogout }) {
   const [loadingCart, setLoadingCart] = useState(false);
   const [busyId, setBusyId] = useState(null); // variantId
   const cartRef = useRef(null);
+  const [openUser, setOpenUser] = useState(false);
+  const userRef = useRef(null);
+
+  const getInitials = (name) => {
+    if (!name) return "?";
+    const parts = String(name).split(/\s+/).filter(Boolean);
+    const a = parts[0] ? parts[0].charAt(0).toUpperCase() : "";
+    const b = parts[1] ? parts[1].charAt(0).toUpperCase() : "";
+    return `${a}${b}` || String(name).charAt(0).toUpperCase();
+  };
 
   const items = cart?.items || [];
   const total = Number(cart?.total || 0);
@@ -39,6 +50,16 @@ export default function Navbar({ user, onLogout }) {
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
+  // close user dropdown on outside click
+  useEffect(() => {
+    const onDownUser = (e) => {
+      if (!userRef.current) return;
+      if (!userRef.current.contains(e.target)) setOpenUser(false);
+    };
+    document.addEventListener("mousedown", onDownUser);
+    return () => document.removeEventListener("mousedown", onDownUser);
+  }, []);
+
   // when open -> load cart
   useEffect(() => {
     if (openCart) loadCart();
@@ -46,29 +67,33 @@ export default function Navbar({ user, onLogout }) {
   }, [openCart]);
 
   const inc = async (variantId, currentQty) => {
-  setBusyId(variantId);
-  try {
-    await api.cart.updateQty(variantId, { quantity: currentQty + 1 });
-    await loadCart();
-  } catch (e) {
-    alert(e?.response?.data || "Failed");
-  } finally {
-    setBusyId(null);
-  }
-};
+    setBusyId(variantId);
+    try {
+      await api.cart.updateQty(variantId, { qty: currentQty + 1 });
+      await loadCart();
+    } catch (e) {
+      console.error("Failed to increase qty", e);
+      const msg = e?.response?.data || e?.message || "Failed";
+      alert(typeof msg === "string" ? msg : JSON.stringify(msg));
+    } finally {
+      setBusyId(null);
+    }
+  };
 
-const dec = async (variantId, currentQty) => {
-  if (currentQty <= 1) return;
-  setBusyId(variantId);
-  try {
-    await api.cart.updateQty(variantId, { quantity: currentQty - 1 });
-    await loadCart();
-  } catch (e) {
-    alert(e?.response?.data || "Failed");
-  } finally {
-    setBusyId(null);
-  }
-};
+  const dec = async (variantId, currentQty) => {
+    if (currentQty <= 1) return;
+    setBusyId(variantId);
+    try {
+      await api.cart.updateQty(variantId, { qty: currentQty - 1 });
+      await loadCart();
+    } catch (e) {
+      console.error("Failed to decrease qty", e);
+      const msg = e?.response?.data || e?.message || "Failed";
+      alert(typeof msg === "string" ? msg : JSON.stringify(msg));
+    } finally {
+      setBusyId(null);
+    }
+  };
 
   const remove = async (variantId) => {
     setBusyId(variantId);
@@ -76,7 +101,9 @@ const dec = async (variantId, currentQty) => {
       await api.cart.remove(variantId);
       await loadCart();
     } catch (e) {
-      alert(e?.response?.data || "Failed");
+      console.error("Failed to remove item", e);
+      const msg = e?.response?.data || e?.message || "Failed";
+      alert(typeof msg === "string" ? msg : JSON.stringify(msg));
     } finally {
       setBusyId(null);
     }
@@ -100,6 +127,25 @@ const dec = async (variantId, currentQty) => {
         <div className="nav__links">
           <Link to="/products" className="nav__link">Products</Link>
         </div>
+
+        <form
+          className="nav__search"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const q = (search || "").trim();
+            navigate(q ? `/products?q=${encodeURIComponent(q)}` : "/products");
+            setSearch("");
+          }}
+        >
+          <input
+            className="nav__searchInput"
+            type="search"
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <button type="submit" className="nav__searchBtn">🔍</button>
+        </form>
 
         <div className="nav__right">
           {/* CART ICON */}
@@ -137,20 +183,20 @@ const dec = async (variantId, currentQty) => {
                               {it.productName} <span className="navCartItem__size">({it.size})</span>
                             </div>
                             <div className="navCartItem__price">
-                              {Number(it.price).toFixed(2)} € / pcs
+                              {Number(it.unitPrice).toFixed(2)} € / pcs
                             </div>
                           </div>
 
                           <div className="navCartItem__qty">
                             <button
-                              onClick={() => dec(it.variantId, it.quantity)}
-                              disabled={busyId === it.variantId || it.quantity <= 1}
+                              onClick={() => dec(it.variantId, it.qty)}
+                              disabled={busyId === it.variantId || it.qty <= 1}
                             >
                               -
                             </button>
-                            <span>{it.quantity}</span>
+                            <span>{it.qty}</span>
                             <button
-                              onClick={() => inc(it.variantId, it.quantity)}
+                              onClick={() => inc(it.variantId, it.qty)}
                               disabled={busyId === it.variantId}
                             >
                               +
@@ -191,8 +237,34 @@ const dec = async (variantId, currentQty) => {
 
           {/* USER AREA */}
           {user ? (
-            <div className="nav__user">
-              <button className="btn" onClick={onLogout}>Logout</button>
+            <div className="nav__user" ref={userRef}>
+              <button
+                className="nav__avatarBtn"
+                title={user.username || user.email}
+                onClick={() => setOpenUser((v) => !v)}
+              >
+                {getInitials(user.username || user.email)}
+              </button>
+
+              {openUser && (
+                <div className="nav__userDropdown">
+                  <div className="nav__userInfo">
+                    <div className="nav__avatarSmall">{getInitials(user.username || user.email)}</div>
+                    <div>
+                      <div className="nav__username">{user.username || user.email}</div>
+                      {user.email && <div className="nav__email">{user.email}</div>}
+                    </div>
+                  </div>
+                  <div style={{ paddingTop: 8 }}>
+                    <button
+                      className="btn btn--primary"
+                      onClick={() => { setOpenUser(false); onLogout(); }}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="nav__auth">

@@ -26,7 +26,8 @@ select * from products
 select * from cart_items]]></console>
     </connection>
     <connection id="c225677a-45ef-473a-a8c8-4c700085589e">
-      <console name="Connection 1" type="STANDARD" schema="public" session="Main"><![CDATA[select * from product_variants]]></console>
+      <console name="Connection 1" type="STANDARD" schema="public" session="Main"><![CDATA[select * from product_variants
+select * from orders]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">

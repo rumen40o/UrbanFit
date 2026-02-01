@@ -3,7 +3,7 @@ import Navbar from './pages/components/Navbar';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Product from './pages/Product';
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import api from './api/api';
 import Cart from './pages/Cart';
 import React, { useEffect, useState } from "react";
@@ -13,6 +13,17 @@ import './App.css';
 function App() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await api.auth.logout();
+      setUser(null);
+      navigate("/login");
+    } catch (e) {
+      alert("Logout failed");
+    }
+  };
 
   useEffect(() => {
     api.auth.me()
@@ -27,7 +38,7 @@ function App() {
 
   return (
     <div className='routers'>
-      <Navbar user={user} setUser={setUser} />
+      <Navbar user={user} setUser={setUser} onLogout={handleLogout} />
 
         <Routes>
             <Route path="/" element={<Home user={user} />} />
