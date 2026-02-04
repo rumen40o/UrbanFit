@@ -1,0 +1,21 @@
+.addrMap {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.addrMap__hint {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.addrMap__box {
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.addrMap__status {
+  font-size: 13px;
+  opacity: 0.85;
+}

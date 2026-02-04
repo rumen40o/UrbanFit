@@ -8,6 +8,7 @@ import api from './api/api';
 import Cart from './pages/Cart';
 import React, { useEffect, useState } from "react";
 import ProductDetails from './pages/ProductDetails';
+import CheckoutPage from './pages/CheckoutPage';
 import './App.css';
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
             <Route path="/products" element={<Product user={user} />} />
             <Route path="/products/:id" element={<ProductDetails user={user} />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
         </Routes>
     </div>
   );

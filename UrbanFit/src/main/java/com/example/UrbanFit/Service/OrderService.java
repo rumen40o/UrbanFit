@@ -32,12 +32,19 @@ public class OrderService implements OrderServiceInterface {
     @Override
     public OrderDto createFromCart(Users user, CreateOrderRequest req) {
         List<CartItem> cartItems = cartRepo.findByUser_Id(user.getId());
-        if (cartItems.isEmpty()) throw new IllegalStateException("Cart is empty");
+        if (cartItems.isEmpty()) {
+            throw new IllegalStateException("Cart is empty");
+        }
 
         Order order = new Order();
         order.setUser(user);
         order.setStatus(OrderStatus.PENDING);
-        order.setPaymentStatus(PaymentStatus.UNPAID);
+
+        // ✅ payment status based on frontend flag
+        order.setPaymentStatus(Boolean.TRUE.equals(req.getPaidWithCard())
+                ? PaymentStatus.PAID
+                : PaymentStatus.UNPAID);
+
         order.setShippingName(req.getShippingName());
         order.setShippingPhone(req.getShippingPhone());
         order.setShippingAddress(req.getShippingAddress());
@@ -87,6 +94,8 @@ public class OrderService implements OrderServiceInterface {
         order.setTotal(total);
 
         Order saved = orderRepo.save(order);
+
+        // clear cart
         cartRepo.deleteByUser_Id(user.getId());
 
         return toDto(saved);
@@ -96,7 +105,9 @@ public class OrderService implements OrderServiceInterface {
     @Transactional(Transactional.TxType.SUPPORTS)
     public List<OrderDto> getMyOrders(Users user) {
         return orderRepo.findByUser_IdOrderByCreatedAtDesc(user.getId())
-                .stream().map(this::toDto).toList();
+                .stream()
+                .map(this::toDto)
+                .toList();
     }
 
     @Override

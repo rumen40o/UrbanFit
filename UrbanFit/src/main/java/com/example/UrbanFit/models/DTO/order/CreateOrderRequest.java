@@ -13,6 +13,9 @@ public class CreateOrderRequest {
     @NotBlank
     private String shippingAddress;
 
+    private Boolean paidWithCard;
+
+
     public String getShippingName() { return shippingName; }
     public void setShippingName(String shippingName) { this.shippingName = shippingName; }
 
@@ -21,4 +24,7 @@ public class CreateOrderRequest {
 
     public String getShippingAddress() { return shippingAddress; }
     public void setShippingAddress(String shippingAddress) { this.shippingAddress = shippingAddress; }
+
+    public Boolean getPaidWithCard() { return paidWithCard; }
+    public void setPaidWithCard(Boolean paidWithCard) { this.paidWithCard = paidWithCard; }
 }

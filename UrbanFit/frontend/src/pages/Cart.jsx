@@ -65,16 +65,9 @@ export default function Cart() {
     }
   };
 
-  const checkout = async () => {
-    try {
-      await api.orders.checkout({}); // ако backend иска адрес/phone - ще го добавим
-      alert("Order created!");
-      navigate("/products");
-    } catch (e) {
-      const msg = e?.response?.data;
-      alert(typeof msg === "string" ? msg : "Checkout failed");
-    }
-  };
+  const goToCheckout = () => {
+  navigate("/checkout");
+};
 
   if (loading) return <div className="cart__info">Loading...</div>;
   if (err) return <div className="cart__error">{err}</div>;
@@ -161,7 +154,7 @@ export default function Cart() {
 
             <div className="cart__summaryActions">
               <button className="btn" onClick={clear}>Clear cart</button>
-              <button className="btn btn--primary" onClick={checkout}>
+              <button className="btn btn--primary" onClick={goToCheckout}>
                 Checkout
               </button>
             </div>

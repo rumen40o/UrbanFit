@@ -1,0 +1,150 @@
+.checkout {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.checkout__title {
+  margin: 0 0 16px;
+}
+
+.checkout__msg {
+  margin-bottom: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.checkout__grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 24px;
+}
+
+.checkout__form,
+.checkout__summary {
+
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.checkout__sectionTitle {
+  margin: 0 0 12px;
+}
+
+.checkout__label {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.checkout__input,
+.checkout__textarea {
+  width: 95%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.checkout__input:focus,
+.checkout__textarea:focus {
+  border-color: #888;
+}
+
+.checkout__btn {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #222;
+  cursor: pointer;
+}
+
+.checkout__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkout__items {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.checkout__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.checkout__itemName {
+  font-weight: 600;
+}
+
+.checkout__itemMeta {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.checkout__itemPrice {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.checkout__empty {
+  opacity: 0.8;
+}
+
+.checkout__totals {
+  border-top: 1px solid #ddd;
+  padding-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.checkout__row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.checkout__row--strong {
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .checkout__grid {
+    grid-template-columns: 1fr;
+  }
+}
+.checkout__pay {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  margin-bottom: 12px;
+}
+
+.checkout__payTitle {
+  font-weight: 600;
+}
+
+.checkout__radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkout__cardBadge {
+  margin-left: 10px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.checkout__cardOpenBtn {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #222;
+  background: #fff;
+  cursor: pointer;
+}
