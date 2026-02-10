@@ -1,0 +1,151 @@
+.epm__backdrop{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.45);
+  backdrop-filter: blur(6px);
+  display:grid; place-items:center;
+  padding:16px; z-index:9999;
+}
+.epm__panel{
+  width:min(720px, 100%);
+  background:#fff;
+  border:1px solid #e5e5e5;
+  border-radius:18px;
+  overflow:hidden;
+}
+.epm__top{
+  display:flex; justify-content:space-between; align-items:flex-start;
+  padding:14px 16px; border-bottom:1px solid #eee;
+}
+.epm__title{ font-weight:900; font-size:18px; }
+.epm__sub{ font-size:12px; opacity:.7; }
+.epm__x{
+  border:1px solid #ddd; background:#fff;
+  border-radius:10px; padding:6px 10px; cursor:pointer;
+}
+.epm__info{ padding:16px; }
+.epm__err{
+  margin:12px 16px 0;
+  padding:10px 12px;
+  border-radius:12px;
+  background:#ffe8e8; border:1px solid #ffd0d0;
+}
+.epm__grid{
+  padding:12px 16px 0;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+}
+.epm__field{ display:grid; gap:6px; font-size:13px; }
+.epm__field input, .epm__field select, .epm__field textarea{
+  border:1px solid #ccc; border-radius:12px;
+  padding:10px 12px; outline:none;
+}
+.epm__field--full{ grid-column: 1 / -1; }
+.epm__check{ display:flex; gap:10px; align-items:center; margin-top:6px; }
+.epm__actions{
+  padding:14px 16px 16px;
+  display:flex; justify-content:flex-end; gap:10px;
+}
+.epm__btn{
+  border:1px solid #222; background:#fff;
+  border-radius:12px; padding:10px 12px; cursor:pointer;
+}
+.epm__btn--primary{ background:#111; color:#fff; }
+
+.epm__h3{
+  padding: 10px 16px 0;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.epm__info--pad{
+  padding: 10px 16px 0;
+}
+
+.epm__variants{
+  padding: 10px 16px 0;
+  display: grid;
+  gap: 8px;
+}
+
+.epm__variantRow{
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.epm__variantSize{
+  font-weight: 700;
+}
+
+.epm__variantInput{
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+/* ✅ NEW: Size management */
+.epm__sizesSection {
+  padding: 10px 16px 0;
+}
+
+.epm__sizeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.epm__addSizeBtn {
+  background: #111;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.epm__addSizeBtn:hover {
+  background: #333;
+}
+
+.epm__variantRow {
+  display: grid;
+  grid-template-columns: 1fr 100px 50px;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-top: 8px;
+}
+
+.epm__variantSizeInput {
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.epm__removeBtn {
+  background: #fee;
+  border: 1px solid #fcc;
+  color: #c00;
+  border-radius: 10px;
+  padding: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.epm__removeBtn:hover {
+  background: #fdd;
+}

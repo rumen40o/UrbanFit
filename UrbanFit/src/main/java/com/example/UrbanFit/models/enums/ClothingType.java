@@ -1,6 +1,7 @@
 package com.example.UrbanFit.models.enums;
 
-public enum ClothingType {TSHIRT,
+public enum ClothingType {
+    TSHIRT,
     PANTS,
     HOODIE,
     JACKET,

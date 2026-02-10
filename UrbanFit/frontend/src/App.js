@@ -3,6 +3,9 @@ import Navbar from './pages/components/Navbar';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Product from './pages/Product';
+import AdminOrders from './pages/AdminOrders';
+import MyOrders from './pages/MyOrders';
+import OrderDetails from './pages/OrderDetails';
 import { Route, Routes, useNavigate } from "react-router-dom";
 import api from './api/api';
 import Cart from './pages/Cart';
@@ -47,6 +50,9 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/products" element={<Product user={user} />} />
             <Route path="/products/:id" element={<ProductDetails user={user} />} />
+            <Route path="/admin/orders" element={<AdminOrders user={user} />} />
+            <Route path="/orders" element={<MyOrders user={user} />} />
+            <Route path="/orders/:id" element={<OrderDetails user={user} />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<CheckoutPage />} />
         </Routes>

@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import AddProductModal from "./components/AddProductModal";
+import EditProductModal from "./components/EditProductModal";
+import ConfirmDialog from "./components/ConfirmDialog";
 import api from "../api/api";
 import { CLOTHING_TYPES, AUDIENCES } from "./components/productEnums";
 import "./Css/Products.css";
@@ -8,9 +10,19 @@ import "./Css/Products.css";
 export default function Products({ user }) {
   const location = useLocation();
   const navigate = useNavigate();
+
   const [addOpen, setAddOpen] = useState(false);
 
-  // query params от URL
+  // ✅ admin manage/delete/edit state
+  const [manageMode, setManageMode] = useState(null); // null, "edit", or "delete"
+  const [manageDropdownOpen, setManageDropdownOpen] = useState(false);
+  const [selected, setSelected] = useState(() => new Set());
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const [editOpen, setEditOpen] = useState(false);
+  const [editId, setEditId] = useState(null);
+
+  // query params
   const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const qParam = params.get("q") || "";
   const typeParam = params.get("type") || "";
@@ -18,17 +30,16 @@ export default function Products({ user }) {
   const sortParam = params.get("sort") || "createdAt,desc";
   const pageParam = parseInt(params.get("page") || "0", 10);
 
-  // local UI state
+  // page state
   const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
-  // controls (от URL)
+  // controls from URL
   const [type, setType] = useState(typeParam);
   const [audience, setAudience] = useState(audienceParam);
   const [sort, setSort] = useState(sortParam);
 
-  // синхронизация ако URL се смени отвън (пример: navbar search)
   useEffect(() => {
     setType(typeParam);
     setAudience(audienceParam);
@@ -44,22 +55,21 @@ export default function Products({ user }) {
     navigate(`/products?${p.toString()}`);
   };
 
-  // load products (on URL change)
+  const buildRequestParams = () => ({
+    page: isNaN(pageParam) ? 0 : pageParam,
+    size: 12,
+    sort: sortParam,
+    q: qParam || undefined,
+    type: typeParam || undefined,
+    audience: audienceParam || undefined,
+  });
+
+  // load products
   useEffect(() => {
     setLoading(true);
     setErr("");
-
-    const requestParams = {
-      page: isNaN(pageParam) ? 0 : pageParam,
-      size: 12,
-      sort: sortParam,
-      q: qParam || undefined,
-      type: typeParam || undefined,
-      audience: audienceParam || undefined,
-    };
-
     api.products
-      .list(requestParams)
+      .list(buildRequestParams())
       .then((res) => setPageData(res.data))
       .catch((e) => {
         const msg = e?.response?.data;
@@ -68,6 +78,16 @@ export default function Products({ user }) {
       })
       .finally(() => setLoading(false));
   }, [qParam, typeParam, audienceParam, sortParam, pageParam]);
+
+  const refresh = () => {
+    setLoading(true);
+    setErr("");
+    api.products
+      .list(buildRequestParams())
+      .then((res) => setPageData(res.data))
+      .catch(() => setErr("Failed to load products"))
+      .finally(() => setLoading(false));
+  };
 
   const onTypeChange = (e) => {
     const val = e.target.value;
@@ -93,24 +113,56 @@ export default function Products({ user }) {
     setUrlParams({ page: Math.min(pageParam + 1, pageData.totalPages - 1) });
   };
 
-  const refresh = () => {
-    const requestParams = {
-      page: isNaN(pageParam) ? 0 : pageParam,
-      size: 12,
-      sort: sortParam,
-      q: qParam || undefined,
-      type: typeParam || undefined,
-      audience: audienceParam || undefined,
-    };
-
-    setLoading(true);
-    setErr("");
-    api.products
-      .list(requestParams)
-      .then((res) => setPageData(res.data))
-      .catch(() => setErr("Failed to load products"))
-      .finally(() => setLoading(false));
+  // ✅ selection helpers
+  const toggleSelect = (id) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   };
+
+  const clearSelection = () => setSelected(new Set());
+
+  const openEdit = (id) => {
+    setEditId(id);
+    setEditOpen(true);
+  };
+
+  const closeEdit = () => {
+    setEditOpen(false);
+    setEditId(null);
+  };
+
+  const editSelected = async () => {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    if (ids.length === 1) {
+      openEdit(ids[0]);
+      setManageMode(null);
+      clearSelection();
+    } else {
+      alert("Please select only one product to edit.");
+    }
+  };
+
+  const deleteSelected = async () => {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+
+    try {
+      await Promise.all(ids.map((id) => api.products.remove(id)));
+      setConfirmOpen(false);
+      clearSelection();
+      setManageMode(null);
+      refresh();
+    } catch (e) {
+      alert("Неуспешно изтриване.");
+    }
+  };
+
+  const isAdmin = user?.role === "ADMIN";
 
   return (
     <div className="products">
@@ -118,10 +170,85 @@ export default function Products({ user }) {
         <div className="products__headerRow">
           <h2>Products</h2>
 
-          {user?.role === "ADMIN" && (
-            <button className="btn btn--primary" onClick={() => setAddOpen(true)}>
-              + Add Product
-            </button>
+          {/* ✅ admin toolbar */}
+          {isAdmin && (
+            <div className="prodAdminBar">
+              <div className="prodAdminBar__dropdown">
+                <button
+                  className="btn btn--primary"
+                  onClick={() => {
+                    if (manageMode) {
+                      setManageMode(null);
+                      setManageDropdownOpen(false);
+                      clearSelection();
+                    } else {
+                      setManageDropdownOpen(!manageDropdownOpen);
+                    }
+                  }}
+                >
+                  {manageMode ? "Exit" : "Manage"}
+                </button>
+
+                {manageDropdownOpen && !manageMode && (
+                  <div className="dropdown__menu">
+                    <button
+                      className="dropdown__item"
+                      onClick={() => {
+                        setManageMode("edit");
+                        setManageDropdownOpen(false);
+                      }}
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      className="dropdown__item"
+                      onClick={() => {
+                        setManageMode("delete");
+                        setManageDropdownOpen(false);
+                      }}
+                    >
+                      🗑️ Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {manageMode === "edit" && (
+                <>
+                  <button
+                    className="btn"
+                    disabled={selected.size !== 1}
+                    onClick={editSelected}
+                  >
+                    Edit ({selected.size}/1)
+                  </button>
+
+                  <button className="btn" disabled={selected.size === 0} onClick={clearSelection}>
+                    Clear
+                  </button>
+                </>
+              )}
+
+              {manageMode === "delete" && (
+                <>
+                  <button
+                    className="btn btn--danger"
+                    disabled={selected.size === 0}
+                    onClick={() => setConfirmOpen(true)}
+                  >
+                    Delete selected ({selected.size})
+                  </button>
+
+                  <button className="btn" disabled={selected.size === 0} onClick={clearSelection}>
+                    Clear
+                  </button>
+                </>
+              )}
+
+              <button className="btn btn--primary" onClick={() => setAddOpen(true)}>
+                + Add Product
+              </button>
+            </div>
           )}
         </div>
 
@@ -183,7 +310,30 @@ export default function Products({ user }) {
         <>
           <div className="products__grid">
             {pageData.content.map((p) => (
-              <Link key={p.id} to={`/products/${p.id}`} className="productCard">
+              <div
+                key={p.id}
+                className={`productCard ${manageMode ? "productCard--manage" : ""}`}
+                onClick={() => {
+                  // ако не сме в manage mode -> влизаме в details
+                  if (!manageMode) navigate(`/products/${p.id}`);
+                }}
+                role="button"
+                tabIndex={0}
+              >
+                {/* ✅ checkbox overlay in edit or delete mode */}
+                {isAdmin && manageMode && (
+                  <label
+                    className="pc__select"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selected.has(p.id)}
+                      onChange={() => toggleSelect(p.id)}
+                    />
+                  </label>
+                )}
+
                 <div className="productCard__imgWrap">
                   {p.imageUrl ? (
                     <img className="productCard__img" src={p.imageUrl} alt={p.name} />
@@ -202,10 +352,18 @@ export default function Products({ user }) {
                   <div className="productCard__meta">
                     <span className="badge badge--neutral">{p.type}</span>
                     <span className="badge badge--neutral">{p.audience}</span>
-                    <span className="badge badge--neutral">View details</span>
+
+                    {/* ✅ keep a Link if you want explicit */}
+                    <Link
+                      className="badge badge--neutral"
+                      to={`/products/${p.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      View details
+                    </Link>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
 
@@ -226,10 +384,26 @@ export default function Products({ user }) {
         </>
       )}
 
-      <AddProductModal
-        open={addOpen}
-        onClose={() => setAddOpen(false)}
-        onCreated={refresh}
+      <AddProductModal open={addOpen} onClose={() => setAddOpen(false)} onCreated={refresh} />
+
+      {/* ✅ confirm delete */}
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete products"
+        message={`Сигурен ли си, че искаш да изтриеш ${selected.size} продукта? Това не може да се върне.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        danger
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={deleteSelected}
+      />
+
+      {/* ✅ edit modal */}
+      <EditProductModal
+        open={editOpen}
+        productId={editId}
+        onClose={closeEdit}
+        onSaved={refresh}
       />
     </div>
   );

@@ -1,21 +1,21 @@
 package com.example.UrbanFit.Service;
 
 import com.example.UrbanFit.Service.interfaces.ProductServiceInterface;
-import com.example.UrbanFit.models.DTO.product.CreateProductRequest;
-import com.example.UrbanFit.models.DTO.product.CreateVariantRequest;
-import com.example.UrbanFit.models.DTO.product.ProductDetailsDto;
-import com.example.UrbanFit.models.DTO.product.ProductDto;
-import com.example.UrbanFit.models.DTO.product.UpdateProductRequest;
-import com.example.UrbanFit.models.DTO.product.VariantDto;
+import com.example.UrbanFit.models.DTO.product.*;
+import com.example.UrbanFit.models.Order;
 import com.example.UrbanFit.models.Product;
 import com.example.UrbanFit.models.ProductVariant;
 import com.example.UrbanFit.models.enums.Audience;
 import com.example.UrbanFit.models.enums.ClothingType;
 import com.example.UrbanFit.repository.ProductRepo;
+import com.example.UrbanFit.repository.OrderRepo;
+import com.example.UrbanFit.repository.ReviewRepo;
+import com.example.UrbanFit.repository.CartItemRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,9 +23,15 @@ import java.util.stream.Collectors;
 public class ProductService implements ProductServiceInterface {
 
     private final ProductRepo repo;
+    private final OrderRepo orderRepo;
+    private final ReviewRepo reviewRepo;
+    private final CartItemRepo cartItemRepo;
 
-    public ProductService(ProductRepo repo) {
+    public ProductService(ProductRepo repo, OrderRepo orderRepo, ReviewRepo reviewRepo, CartItemRepo cartItemRepo) {
         this.repo = repo;
+        this.orderRepo = orderRepo;
+        this.reviewRepo = reviewRepo;
+        this.cartItemRepo = cartItemRepo;
     }
 
     @Override
@@ -134,14 +140,49 @@ public class ProductService implements ProductServiceInterface {
         Product p = repo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
+        // --- product fields ---
         if (req.getName() != null) p.setName(req.getName().trim());
         if (req.getDescription() != null) p.setDescription(req.getDescription());
         if (req.getPrice() != null) p.setPrice(req.getPrice());
         if (req.getImageUrl() != null) p.setImageUrl(req.getImageUrl());
         if (req.getActive() != null) p.setActive(req.getActive());
-
         if (req.getType() != null) p.setType(req.getType());
         if (req.getAudience() != null) p.setAudience(req.getAudience());
+
+        // --- ✅ variants stock update + new variants + removals ---
+        if (req.getVariants() != null) {
+            // First, remove variants that are no longer in the request
+            p.getVariants().removeIf(existing -> 
+                !req.getVariants().stream().anyMatch(vr -> vr.getId() != null && vr.getId().equals(existing.getId()))
+            );
+            
+            // Then, update or create variants
+            for (UpdateVariantStockRequest vr : req.getVariants()) {
+                if (vr.getSize() == null || vr.getSize().isBlank())
+                    throw new IllegalArgumentException("Variant size is required");
+                if (vr.getStockQty() == null || vr.getStockQty() < 0)
+                    throw new IllegalArgumentException("stockQty must be >= 0");
+
+                if (vr.getId() == null) {
+                    // ✅ NEW variant - create it
+                    ProductVariant newVariant = new ProductVariant();
+                    newVariant.setSize(vr.getSize().trim());
+                    newVariant.setStockQty(vr.getStockQty());
+                    newVariant.setProduct(p);
+                    p.getVariants().add(newVariant);
+                } else {
+                    // ✅ EXISTING variant - update it
+                    ProductVariant variant = p.getVariants().stream()
+                            .filter(v -> v.getId().equals(vr.getId()))
+                            .findFirst()
+                            .orElseThrow(() ->
+                                    new IllegalArgumentException("Variant not found for product"));
+                    
+                    variant.setSize(vr.getSize().trim());
+                    variant.setStockQty(vr.getStockQty());
+                }
+            }
+        }
 
         return toListDto(p);
     }
@@ -149,6 +190,19 @@ public class ProductService implements ProductServiceInterface {
     @Override
     public void delete(Long id) {
         if (!repo.existsById(id)) throw new IllegalArgumentException("Product not found");
+
+        // delete reviews referencing this product
+        reviewRepo.deleteByProduct_Id(id);
+
+        // delete cart items that reference variants of this product
+        cartItemRepo.deleteByVariant_Product_Id(id);
+
+        // Find and delete any orders that contain this product (order items store productId as snapshot)
+        List<Order> ordersWithProduct = orderRepo.findByItemProductId(id);
+        if (ordersWithProduct != null && !ordersWithProduct.isEmpty()) {
+            orderRepo.deleteAll(ordersWithProduct);
+        }
+
         repo.deleteById(id);
     }
 

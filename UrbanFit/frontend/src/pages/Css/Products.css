@@ -191,3 +191,84 @@
 .btn--primary:hover {
   background: #000;
 }
+
+.prodAdminBar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.btn--danger {
+  border: 1px solid #b00020;
+  color: #b00020;
+}
+
+.btn--small {
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+.productCard {
+  position: relative;
+}
+
+.pc__select {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 6px;
+}
+
+.pc__actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+/* ✅ Dropdown Menu */
+.prodAdminBar__dropdown {
+  position: relative;
+}
+
+.dropdown__menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  margin-top: 4px;
+  min-width: 140px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 100;
+}
+
+.dropdown__item {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #111827;
+  transition: background 0.2s;
+}
+
+.dropdown__item:hover {
+  background: #f3f4f6;
+}
+
+.dropdown__item:first-child {
+  border-radius: 10px 10px 0 0;
+}
+
+.dropdown__item:last-child {
+  border-radius: 0 0 10px 10px;
+}

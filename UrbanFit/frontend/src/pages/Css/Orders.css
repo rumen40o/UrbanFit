@@ -1,0 +1,47 @@
+.ordersPage {
+  padding: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+.ordersHeader {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.ordersHeader h2 { margin:0; font-size:20px; }
+.ordersTable {
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+  background:white;
+  border-radius:10px;
+  overflow:hidden;
+}
+.ordersTable thead { background:#f9fafb; }
+.ordersTable th, .ordersTable td { padding:12px 14px; text-align:left; font-size:14px; }
+.ordersTable tbody tr { border-top:1px solid #f1f5f9; }
+.ordersTable td a { color:#0f172a; text-decoration:underline; }
+.statusSelect { padding:6px 8px; border-radius:8px; border:1px solid #e6e9ee; }
+.badge { display:inline-block; padding:6px 8px; border-radius:999px; font-weight:700; font-size:12px; }
+.badge--PENDING { background:#fff7ed; color:#92400e; border:1px solid #fde3c8; }
+.badge--PAID { background:#ecfdf5; color:#065f46; border:1px solid #c8f7dc; }
+.badge--SHIPPED { background:#eef2ff; color:#3730a3; border:1px solid #d6ddff; }
+.badge--DELIVERED { background:#f0fdf4; color:#065f46; border:1px solid #dff7e6; }
+.badge--CANCELLED { background:#fff1f2; color:#9f1239; border:1px solid #ffd6de; }
+.ordersPager { margin-top:12px; display:flex; gap:8px; align-items:center; }
+
+.orderCard {
+  border:1px solid #eef2f7; padding:12px; border-radius:10px; background:white;
+}
+.orderCard + .orderCard { margin-top:10px; }
+.orderItems { margin-top:12px; display:grid; gap:8px; }
+.orderItem { display:flex; justify-content:space-between; gap:10px; padding:8px; border-radius:8px; border:1px solid #f1f5f9; }
+.muted { color:#6b7280; }
+.small { font-size:13px; color:#475569; }
+
+/* Rating stars */
+.ratingStars { display:flex; align-items:center; }
+.star { color: #cbd5e1; transition: color .12s ease, transform .12s ease; font-size:32px; }
+.star:hover { transform: translateY(-4px); }
+.star.filled { color: #f59e0b; }
+.star:focus { outline: 2px solid rgba(245,158,11,0.18); border-radius:6px; }
+

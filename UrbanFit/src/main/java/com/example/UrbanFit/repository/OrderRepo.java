@@ -14,4 +14,8 @@ public interface OrderRepo extends JpaRepository<Order, Long> {
     Page<Order> findAllByOrderByCreatedAtDesc(Pageable pageable);
     Page<Order> findByStatusOrderByCreatedAtDesc(OrderStatus status, Pageable pageable);
     Optional<Order> findByIdAndUser_Id(Long id, Long userId);
+
+    // find orders that have items referencing a product id snapshot
+    @org.springframework.data.jpa.repository.Query("select distinct o from Order o join o.items i where i.productId = :productId")
+    java.util.List<Order> findByItemProductId(@org.springframework.data.repository.query.Param("productId") Long productId);
 }

@@ -8,8 +8,10 @@ import com.example.UrbanFit.models.Review;
 import com.example.UrbanFit.models.Users;
 import com.example.UrbanFit.repository.ProductRepo;
 import com.example.UrbanFit.repository.ReviewRepo;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -35,7 +37,7 @@ public class ReviewService implements ReviewServiceInterface {
     @Override
     public ReviewDto createOrUpdate(Users user, CreateReviewRequest req) {
         Product product = productRepo.findById(req.getProductId())
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
         Review review = reviewRepo.findByUser_IdAndProduct_Id(user.getId(), product.getId())
                 .orElse(null);

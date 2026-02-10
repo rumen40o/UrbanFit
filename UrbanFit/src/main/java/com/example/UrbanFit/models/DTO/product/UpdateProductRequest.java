@@ -4,6 +4,8 @@ import com.example.UrbanFit.models.enums.Audience;
 import com.example.UrbanFit.models.enums.ClothingType;
 import jakarta.validation.constraints.Min;
 
+import java.util.List;
+
 public class UpdateProductRequest {
 
     private String name;
@@ -20,7 +22,17 @@ public class UpdateProductRequest {
 
     private Boolean active;
 
+    private List<UpdateVariantStockRequest> variants;
+
+
     // getters/setters
+    public List<UpdateVariantStockRequest> getVariants() {
+        return variants;
+    }
+    public void setVariants(List<UpdateVariantStockRequest> variants) {
+        this.variants = variants;
+    }
+
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 

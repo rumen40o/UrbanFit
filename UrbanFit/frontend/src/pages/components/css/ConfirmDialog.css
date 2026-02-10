@@ -1,0 +1,25 @@
+.cd__backdrop{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.45);
+  display:grid; place-items:center;
+  padding:16px; z-index:9999;
+}
+.cd__panel{
+  width:min(460px, 100%);
+  background:#fff;
+  border:1px solid #e5e5e5;
+  border-radius:16px;
+  padding:16px;
+}
+.cd__title{ font-weight:800; font-size:18px; margin-bottom:6px; }
+.cd__msg{ opacity:.85; margin-bottom:14px; }
+.cd__actions{ display:flex; gap:10px; justify-content:flex-end; }
+.cd__btn{
+  border:1px solid #222;
+  background:#fff;
+  border-radius:12px;
+  padding:10px 12px;
+  cursor:pointer;
+}
+.cd__btn--primary{ background:#111; color:#fff; }
+.cd__btn--danger{ background:#b00020; border-color:#b00020; color:#fff; }

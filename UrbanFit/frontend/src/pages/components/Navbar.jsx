@@ -126,6 +126,12 @@ export default function Navbar({ user, onLogout }) {
 
         <div className="nav__links">
           <Link to="/products" className="nav__link">Products</Link>
+          {user && (
+            <Link to="/orders" className="nav__link">My Orders</Link>
+          )}
+          {user?.role === "ADMIN" && (
+            <Link to="/admin/orders" className="nav__link">Admin Orders</Link>
+          )}
         </div>
 
         <form

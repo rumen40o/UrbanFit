@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import api from "../api/api";
 import "./Css/ProductDetails.css";
+import "./Css/Orders.css";
+import ReviewModal from "./components/ReviewModal";
 
 export default function ProductDetails({ user }) {
   const { id } = useParams();
@@ -11,6 +13,10 @@ export default function ProductDetails({ user }) {
   const [err, setErr] = useState("");
 
   const [selectedVariantId, setSelectedVariantId] = useState("");
+  const [reviews, setReviews] = useState([]);
+  const [avgRating, setAvgRating] = useState(null);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [myReview, setMyReview] = useState(null);
 
   const selectedVariant = useMemo(() => {
     if (!p?.variants?.length) return null;
@@ -38,6 +44,19 @@ export default function ProductDetails({ user }) {
         setP(null);
       })
       .finally(() => setLoading(false));
+    // load reviews
+    api.reviews.byProduct(id)
+      .then((r) => {
+        const list = r.data || [];
+        setReviews(list);
+        if (list.length > 0) {
+          const avg = list.reduce((a, b) => a + (b.rating || 0), 0) / list.length;
+          setAvgRating(avg);
+        } else setAvgRating(null);
+        const mine = list.find((x) => x.userId === user?.id) || null;
+        setMyReview(mine);
+      })
+      .catch(() => {});
   }, [id]);
 
   const addToCart = async () => {
@@ -136,6 +155,33 @@ export default function ProductDetails({ user }) {
             </div>
           </div>
 
+          <div style={{ marginTop: 18 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div>
+                <strong>Rating</strong>
+                <div className="small muted">{avgRating ? avgRating.toFixed(1) : 'No rating yet'}</div>
+              </div>
+            </div>
+
+            <div style={{ marginTop: 12 }}>
+              {reviews.length === 0 ? (
+                <div className="muted">No reviews yet.</div>
+              ) : (
+                <div style={{ display: 'grid', gap: 10 }}>
+                  {reviews.map((r) => (
+                    <div key={r.id} style={{ border: '1px solid #f1f5f9', padding: 10, borderRadius: 8 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div><b>{r.username || 'User'}</b></div>
+                        <div className={`badge badge--${r.rating >= 4 ? 'PAID' : r.rating >= 3 ? 'SHIPPED' : 'PENDING'}`}>{r.rating}★</div>
+                      </div>
+                      {r.comment && <div className="small muted" style={{ marginTop: 6 }}>{r.comment}</div>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
           
         </div>
       </div>
@@ -143,4 +189,16 @@ export default function ProductDetails({ user }) {
       {/* Reviews section - добавяме след това ако искаш */}
     </div>
   );
+        <ReviewModal open={reviewModalOpen} productId={id} existing={myReview} onClose={() => setReviewModalOpen(false)} onSaved={() => {
+          api.reviews.byProduct(id).then((r) => {
+            const list = r.data || [];
+            setReviews(list);
+            if (list.length > 0) {
+              const avg = list.reduce((a, b) => a + (b.rating || 0), 0) / list.length;
+              setAvgRating(avg);
+            } else setAvgRating(null);
+            const mine = list.find((x) => x.userId === user?.id) || null;
+            setMyReview(mine);
+          }).catch(()=>{});
+        }} />
 }
